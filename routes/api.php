@@ -7,23 +7,10 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ContractorController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ApiDocsController;
 
 Route::middleware('throttle:api')->group(function () {
-    Route::get('/endpoints', function () {
-        $routes = collect(\Illuminate\Support\Facades\Route::getRoutes())->map(function ($route) {
-            return [
-                'method' => implode('|', $route->methods()),
-                'uri' => '/' . $route->uri(),
-            ];
-        })->filter(function ($route) {
-            return str_starts_with($route['uri'], '/api');
-        })->values();
-
-        return response()->json([
-            'message' => 'Available API Endpoints',
-            'endpoints' => $routes
-        ]);
-    });
+    Route::get('/endpoints', [ApiDocsController::class, 'index']);
 
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
