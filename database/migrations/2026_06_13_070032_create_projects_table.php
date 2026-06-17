@@ -16,9 +16,13 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->string('location')->nullable();
-            $table->decimal('budget', 15, 2)->nullable();
             $table->date('start_date')->nullable();
+            $table->date('expected_completion_date')->nullable();
+            $table->decimal('budget', 15, 2)->nullable();
+            $table->text('notes')->nullable();
+            $table->enum('status', ['Active', 'Completed', 'Paused'])->default('Active');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

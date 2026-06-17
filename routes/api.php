@@ -4,9 +4,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProjectController;
-use App\Http\Controllers\ContractorController;
-use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\VendorController;
+use App\Http\Controllers\BillController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\LabourContractorController;
+use App\Http\Controllers\LabourBillController;
+use App\Http\Controllers\LabourPaymentController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ApiDocsController;
 
 Route::middleware('throttle:api')->group(function () {
@@ -21,14 +25,14 @@ Route::middleware('throttle:api')->group(function () {
         });
         Route::post('/logout', [AuthController::class, 'logout']);
 
+        Route::get('/dashboard', [DashboardController::class, 'index']);
+
         Route::apiResource('projects', ProjectController::class);
-        Route::apiResource('contractors', ContractorController::class);
-        Route::get('/contractors/near/{location}', [ContractorController::class, 'nearLocation']);
-        
-        Route::apiResource('expenses', ExpenseController::class);
-        Route::get('/expenses/project/{projectId}', [ExpenseController::class, 'byProject']);
-        
+        Route::apiResource('vendors', VendorController::class);
+        Route::apiResource('bills', BillController::class);
         Route::apiResource('payments', PaymentController::class);
-        Route::get('/payments/project/{projectId}', [PaymentController::class, 'byProject']);
+        Route::apiResource('labour-contractors', LabourContractorController::class);
+        Route::apiResource('labour-bills', LabourBillController::class);
+        Route::apiResource('labour-payments', LabourPaymentController::class);
     });
 });

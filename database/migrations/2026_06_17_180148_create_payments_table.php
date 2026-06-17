@@ -11,14 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('expenses', function (Blueprint $table) {
+        Schema::create('payments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('project_id')->constrained()->onDelete('cascade');
-            $table->string('category');
+            $table->foreignId('bill_id')->constrained()->onDelete('cascade');
             $table->decimal('amount', 15, 2);
-            $table->date('date');
-            $table->text('description')->nullable();
+            $table->date('payment_date')->nullable();
+            $table->string('payment_mode')->nullable(); // Cash, UPI, Bank Transfer, Cheque
+            $table->text('remarks')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('expenses');
+        Schema::dropIfExists('payments');
     }
 };

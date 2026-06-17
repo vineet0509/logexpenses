@@ -1,17 +1,17 @@
 <?php
 namespace App\Http\Controllers;
-use App\Models\Payment;
-use App\Models\Bill;
+use App\Models\LabourPayment;
+use App\Models\LabourBill;
 use Illuminate\Http\Request;
 
-class PaymentController extends Controller
+class LabourPaymentController extends Controller
 {
     public function index(Request $request)
     {
-        $billId = $request->query('bill_id');
-        $query = Payment::with('bill');
+        $billId = $request->query('labour_bill_id');
+        $query = LabourPayment::with('labourBill');
         if ($billId) {
-            $query->where('bill_id', $billId);
+            $query->where('labour_bill_id', $billId);
         }
         return response()->json($query->get());
     }
@@ -19,19 +19,19 @@ class PaymentController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'bill_id' => 'required|exists:bills,id',
+            'labour_bill_id' => 'required|exists:labour_bills,id',
             'amount' => 'required|numeric',
             'payment_date' => 'nullable|date',
             'payment_mode' => 'nullable|string',
             'remarks' => 'nullable|string'
         ]);
         
-        $payment = Payment::create($validated);
+        $payment = LabourPayment::create($validated);
         
         // Update bill status
-        $bill = Bill::find($validated['bill_id']);
-        $totalPaid = $bill->payments()->sum('amount');
-        if ($totalPaid >= $bill->bill_amount) {
+        $bill = LabourBill::find($validated['labour_bill_id']);
+        $totalPaid = $bill->labourPayments()->sum('amount');
+        if ($totalPaid >= $bill->amount) {
             $bill->status = 'Paid';
         } elseif ($totalPaid > 0) {
             $bill->status = 'Partially Paid';
@@ -43,14 +43,14 @@ class PaymentController extends Controller
         return response()->json($payment, 201);
     }
 
-    public function destroy(Payment $payment)
+    public function destroy(LabourPayment $labourPayment)
     {
-        $bill = $payment->bill;
-        $payment->delete();
+        $bill = $labourPayment->labourBill;
+        $labourPayment->delete();
         
         // Update bill status
-        $totalPaid = $bill->payments()->sum('amount');
-        if ($totalPaid >= $bill->bill_amount) {
+        $totalPaid = $bill->labourPayments()->sum('amount');
+        if ($totalPaid >= $bill->amount) {
             $bill->status = 'Paid';
         } elseif ($totalPaid > 0) {
             $bill->status = 'Partially Paid';

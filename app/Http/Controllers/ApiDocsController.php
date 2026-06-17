@@ -9,235 +9,108 @@ class ApiDocsController extends Controller
     public function index()
     {
         return response()->json([
-            'message' => 'Available API Endpoints Documentation',
+            'base_url' => url('/api'),
             'endpoints' => [
-                [
-                    'method' => 'POST',
-                    'uri' => '/api/register',
-                    'description' => 'Register a new user',
-                    'required_params' => ['name', 'email', 'password', 'password_confirmation'],
-                    'response' => [
-                        'user' => ['id' => 1, 'name' => 'John Doe', 'email' => 'john@example.com'],
-                        'token' => '1|laravel_sanctum_token...'
-                    ]
-                ],
-                [
-                    'method' => 'POST',
-                    'uri' => '/api/login',
-                    'description' => 'Login a user',
-                    'required_params' => ['email', 'password'],
-                    'response' => [
-                        'user' => ['id' => 1, 'name' => 'John Doe', 'email' => 'john@example.com'],
-                        'token' => '2|laravel_sanctum_token...'
-                    ]
-                ],
-                [
-                    'method' => 'POST',
-                    'uri' => '/api/logout',
-                    'description' => 'Logout user and invalidate token',
-                    'required_params' => ['(Headers) Authorization: Bearer {token}'],
-                    'response' => [
-                        'message' => 'Logged out successfully'
-                    ]
-                ],
-                [
-                    'method' => 'GET',
-                    'uri' => '/api/projects',
-                    'description' => 'List all projects for the authenticated user (Paginated)',
-                    'required_params' => ['(Headers) Authorization: Bearer {token}'],
-                    'response' => [
-                        'data' => [
-                            [
-                                'id' => 1,
-                                'name' => 'Downtown Skyscraper',
-                                'location' => 'New York',
-                                'budget' => 5000000.00,
-                                'start_date' => '2026-07-01'
-                            ]
-                        ],
-                        'links' => ['first' => '...', 'next' => null],
-                        'meta' => ['current_page' => 1, 'total' => 1]
-                    ]
-                ],
-                [
-                    'method' => 'POST',
-                    'uri' => '/api/projects',
-                    'description' => 'Create a new project',
-                    'required_params' => [
-                        '(Headers) Authorization: Bearer {token}', 
-                        'name (string)', 
-                        'location (string)', 
-                        'budget (numeric)', 
-                        'start_date (date)'
+                'Authentication' => [
+                    [
+                        'url' => '/api/register',
+                        'method' => 'POST',
+                        'description' => 'Register a new user account',
+                        'params' => ['name' => 'string', 'email' => 'string', 'password' => 'string', 'password_confirmation' => 'string'],
+                        'response' => ['user' => ['id' => 1, 'name' => 'John', 'email' => 'john@test.com'], 'token' => '1|xyz...']
                     ],
-                    'response' => [
-                        'data' => [
-                            'id' => 2,
-                            'name' => 'Suburban Mall',
-                            'location' => 'Chicago',
-                            'budget' => 1500000.00,
-                            'start_date' => '2026-08-15'
+                    [
+                        'url' => '/api/login',
+                        'method' => 'POST',
+                        'description' => 'Login to existing account',
+                        'params' => ['email' => 'string', 'password' => 'string'],
+                        'response' => ['user' => ['id' => 1, 'name' => 'John', 'email' => 'john@test.com'], 'token' => '2|abc...']
+                    ]
+                ],
+                'Dashboard' => [
+                    [
+                        'url' => '/api/dashboard?project_id=1',
+                        'method' => 'GET',
+                        'description' => 'Get high-level budget calculation and expenses breakdown',
+                        'params' => ['project_id' => 'integer (required)'],
+                        'response' => [
+                            'project' => 'My Home',
+                            'budget' => 2000000,
+                            'spent' => 50000,
+                            'remaining' => 1950000,
+                            'outstanding' => 10000,
+                            'expenses_breakdown' => ['materials' => 30000, 'labour' => 20000]
                         ]
                     ]
                 ],
-                [
-                    'method' => 'PUT',
-                    'uri' => '/api/projects/{project}',
-                    'description' => 'Update an existing project',
-                    'required_params' => [
-                        '(Headers) Authorization: Bearer {token}', 
-                        '(URL) project ID',
-                        'name (string)', 
-                        'location (string)', 
-                        'budget (numeric)', 
-                        'start_date (date)'
+                'Projects' => [
+                    [
+                        'url' => '/api/projects',
+                        'method' => 'GET',
+                        'description' => 'List all projects for the authenticated user',
+                        'params' => [],
+                        'response' => [['id' => 1, 'name' => 'Home Construction', 'budget' => 2000000, 'status' => 'Active']]
                     ],
-                    'response' => [
-                        'data' => [
-                            'id' => 1,
-                            'name' => 'Updated Skyscraper Name',
-                            'location' => 'New York',
-                            'budget' => 5500000.00,
-                            'start_date' => '2026-07-01'
-                        ]
+                    [
+                        'url' => '/api/projects',
+                        'method' => 'POST',
+                        'description' => 'Create a new project',
+                        'params' => ['name' => 'string', 'location' => 'string', 'budget' => 'number', 'expected_completion_date' => 'date'],
+                        'response' => ['id' => 1, 'name' => 'Home Construction', 'status' => 'Active']
                     ]
                 ],
-                [
-                    'method' => 'GET',
-                    'uri' => '/api/contractors',
-                    'description' => 'List all contractors (Paginated)',
-                    'required_params' => ['(Headers) Authorization: Bearer {token}'],
-                    'response' => [
-                        'data' => [
-                            [
-                                'id' => 1,
-                                'name' => 'Bob Builder',
-                                'phone' => '555-1234',
-                                'specialty' => 'Plumbing',
-                                'location' => 'New York'
-                            ]
-                        ]
+                'Material Vendors' => [
+                    [
+                        'url' => '/api/vendors?project_id=1',
+                        'method' => 'GET',
+                        'description' => 'List vendors for a specific project',
+                        'params' => ['project_id' => 'integer'],
+                        'response' => [['id' => 1, 'name' => 'ABC Hardware', 'mobile' => '9876543210']]
                     ]
                 ],
-                [
-                    'method' => 'POST',
-                    'uri' => '/api/contractors',
-                    'description' => 'Add a new contractor',
-                    'required_params' => [
-                        '(Headers) Authorization: Bearer {token}',
-                        'name (string)',
-                        'phone (string)',
-                        'specialty (string)',
-                        'location (string)'
-                    ],
-                    'response' => [
-                        'data' => [
-                            'id' => 2,
-                            'name' => 'Alice Electrician',
-                            'phone' => '555-9876',
-                            'specialty' => 'Electrical',
-                            'location' => 'Chicago'
-                        ]
+                'Material Bills' => [
+                    [
+                        'url' => '/api/bills',
+                        'method' => 'POST',
+                        'description' => 'Add a new material bill',
+                        'params' => ['project_id' => 'integer', 'vendor_id' => 'integer', 'category_id' => 'integer', 'bill_amount' => 'number', 'bill_date' => 'date'],
+                        'response' => ['id' => 1, 'bill_amount' => 100000, 'status' => 'Pending']
                     ]
                 ],
-                [
-                    'method' => 'GET',
-                    'uri' => '/api/contractors/near/{location}',
-                    'description' => 'Find contractors near a specific location',
-                    'required_params' => ['(Headers) Authorization: Bearer {token}', '(URL) location'],
-                    'response' => [
-                        'data' => [
-                            [
-                                'id' => 1,
-                                'name' => 'Bob Builder',
-                                'specialty' => 'Plumbing',
-                                'location' => 'New York'
-                            ]
-                        ]
+                'Material Payments' => [
+                    [
+                        'url' => '/api/payments',
+                        'method' => 'POST',
+                        'description' => 'Record a payment against a material bill',
+                        'params' => ['bill_id' => 'integer', 'amount' => 'number', 'payment_mode' => 'string'],
+                        'response' => ['id' => 1, 'amount' => 20000, 'payment_mode' => 'Cash']
                     ]
                 ],
-                [
-                    'method' => 'POST',
-                    'uri' => '/api/expenses',
-                    'description' => 'Log a new expense for a project',
-                    'required_params' => [
-                        '(Headers) Authorization: Bearer {token}', 
-                        'project_id (exists)', 
-                        'category (string)', 
-                        'amount (numeric)', 
-                        'date (date)'
-                    ],
-                    'response' => [
-                        'data' => [
-                            'id' => 1,
-                            'project_id' => 1,
-                            'category' => 'Materials',
-                            'amount' => 15000.00,
-                            'date' => '2026-06-15'
-                        ]
+                'Labour Contractors' => [
+                    [
+                        'url' => '/api/labour-contractors?project_id=1',
+                        'method' => 'GET',
+                        'description' => 'List labour contractors for a project',
+                        'params' => ['project_id' => 'integer'],
+                        'response' => [['id' => 1, 'name' => 'Ramesh Singh', 'work_type' => 'Mason']]
                     ]
                 ],
-                [
-                    'method' => 'GET',
-                    'uri' => '/api/expenses/project/{projectId}',
-                    'description' => 'Get all expenses for a specific project',
-                    'required_params' => [
-                        '(Headers) Authorization: Bearer {token}', 
-                        '(URL) projectId'
-                    ],
-                    'response' => [
-                        'data' => [
-                            [
-                                'id' => 1,
-                                'project_id' => 1,
-                                'category' => 'Materials',
-                                'amount' => 15000.00,
-                                'date' => '2026-06-15'
-                            ]
-                        ]
+                'Labour Bills' => [
+                    [
+                        'url' => '/api/labour-bills',
+                        'method' => 'POST',
+                        'description' => 'Add a new labour bill',
+                        'params' => ['project_id' => 'integer', 'labour_contractor_id' => 'integer', 'amount' => 'number', 'work_description' => 'string'],
+                        'response' => ['id' => 1, 'amount' => 5000, 'status' => 'Pending']
                     ]
                 ],
-                [
-                    'method' => 'POST',
-                    'uri' => '/api/payments',
-                    'description' => 'Log a payment to a contractor for a project',
-                    'required_params' => [
-                        '(Headers) Authorization: Bearer {token}', 
-                        'project_id (exists)', 
-                        'contractor_id (exists)', 
-                        'amount (numeric)', 
-                        'date (date)'
-                    ],
-                    'response' => [
-                        'data' => [
-                            'id' => 1,
-                            'project_id' => 1,
-                            'contractor_id' => 1,
-                            'amount' => 5000.00,
-                            'date' => '2026-06-16',
-                            'project' => ['id' => 1, 'name' => 'Downtown Skyscraper'],
-                            'contractor' => ['id' => 1, 'name' => 'Bob Builder']
-                        ]
-                    ]
-                ],
-                [
-                    'method' => 'GET',
-                    'uri' => '/api/payments/project/{projectId}',
-                    'description' => 'Get all payments associated with a specific project',
-                    'required_params' => [
-                        '(Headers) Authorization: Bearer {token}', 
-                        '(URL) projectId'
-                    ],
-                    'response' => [
-                        'data' => [
-                            [
-                                'id' => 1,
-                                'project_id' => 1,
-                                'contractor_id' => 1,
-                                'amount' => 5000.00,
-                                'date' => '2026-06-16'
-                            ]
-                        ]
+                'Labour Payments' => [
+                    [
+                        'url' => '/api/labour-payments',
+                        'method' => 'POST',
+                        'description' => 'Record a payment against a labour bill',
+                        'params' => ['labour_bill_id' => 'integer', 'amount' => 'number', 'payment_mode' => 'string'],
+                        'response' => ['id' => 1, 'amount' => 5000, 'payment_mode' => 'UPI']
                     ]
                 ]
             ]
